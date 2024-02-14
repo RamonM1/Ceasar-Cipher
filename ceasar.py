@@ -1,54 +1,60 @@
-import sys
+# this line defines all the letters in the alphabet
+letters= "abcdefghijklmnopqrstuvwxyz"
 
-FIRST_CHAR_CODE=ord("A") #The ord function returns the Unicode code point of a character.
-LAST_CHAR_CODE=ord("Z")
-CHAR_RANGE=LAST_CHAR_CODE - FIRST_CHAR_CODE + 1 #It subtracts the Unicode code point of the first character from the Unicode code point of the last character and adds 1. 
+def encrypt(plaintext, key):#defines the encrypt function taking two parameters plaintext and key
+    ciphertext= '' #initiates empty string ciphertext to store encrypted text 
+    for letter in plaintext:#begins a loop
+        letter = letter.lower() #converts each character to lowercase just incase uppercase is used
+        if not letter == ' ': #checks that there are no spaces
+            index = letters.find(letter) #finds the index characters used in the string
+            if index == -1: #checks if letters are not found in the letter string
+                ciphertext += letter #if letters are not found  it is added to the ciphertext as is
+            else:
+                new_index = index + key #calculates the new index by shifting the according to the enncryption key
+                if new_index >= 26: #checks if index is within the alphabet
+                    new_index -= 26 #checks if index is beyond the alphabet
+                ciphertext += letters[new_index] #letter are added to the new cipher string witht the new indec
+    return ciphertext #returns final encrypted text
+# decrypt fundtion is very similar to the encrypt function above I will highlight the few differences
+def decrypt(ciphertext, key):#the two parameters are ciphertext and the decryption key 
+    plaintext= '' #initiates the empty string that will store the decrypted text
+    for letter in ciphertext: #the loop begins with ciphertext, throughout this block of code we swapped cipher text with plaintext as that is the output we are expecting
+        letter = letter.lower()
+        if not letter == ' ':
+            index = letters.find(letter)
+            if index == -1:
+                plaintext += letter
+            else:
+                new_index = index - key # calculates the shifting index subtracting the key rather than adding it as in the encrypt block
+                if new_index < 0: # checks if new index is 0, as an output is expected within 26
+                    new_index += 26 #if 0 it adds the alphabet within 26 characters
+        plaintext += letters[new_index] #the character in the the new_index is added to the plaintext
+    return plaintext #returns the decrypted message
 
-def encrypt(message, k):
-    result = ""
-    for char in message.upper():#This method is used to convert all characters in the message to uppercase.
-        if char.isalpha():#It is a method in Python used to check if the given character is an alphabetic character.
-            char_code=ord(char) # The function returns the Unicode code point of the character char.
-            
-            k = k % CHAR_RANGE # Use modulo operation to handle large keys
+#intro to ther cipher program
+print()
+print("*** CEASAR CIPHER PROGRAM ***")
+print()
 
-            new_char_code=char_code+k #The line calculates the new Unicode code point for the character after shifting by the specified key (k).
+#prompts user to either encrypt or decrypt and takes user input while converting it to lower case 
+print('Do you want to encrypt or decrypt?')
+user_input = input('e/d: ').lower()
+print()
 
-            if new_char_code>LAST_CHAR_CODE:#Basically,the code allows to start again from the beginning of the alphabet. 
-                new_char_code-=CHAR_RANGE
+#if e is chosen that means encrypt mode is selected, calling the encrypt function and printing ciphered text
+if user_input == 'e':
+    print('ENCRYPTION MODE SELECTED')
+    print()
+    key = int(input('Enter the key (1 through 26):' ))
+    text = input('Enter the text to encrypt: ')
+    ciphertext = encrypt(text, key)
+    print(f'CIPHERTEXT: {ciphertext}')
 
-            if new_char_code<FIRST_CHAR_CODE:#Basically, the code allows to move to the first aplhabet. 
-                new_char_code+=CHAR_RANGE
-        
-            new_char=chr(new_char_code)
-            result += new_char #it allows to append the character to the result string. 
-    
-
-        else:
-            result+=char #if it is not alphabet, it will remains unchanged and is appended to the result string without any modification. 
-
-    return result
-
-
-
-def decrypt(message, k):
-    return encrypt(message, -k)  # Decrypting is the same as encrypting with the negative key
-
-if __name__ == "__main__":
-
-    if len(sys.argv) != 3: #This condition checks if the number of command-line arguments is not equal to 3. 
-        print("Usage: python caesar.py <word> <key>")
-        sys.exit(1) #This line terminates the script with a status code of 1.
-
-    
-    message = sys.argv[1] # take in first arg as word
-    
-    key = int(sys.argv[2]) # take in second arg as int key
-
-    encrypted = encrypt(message, key) # encrypt the word
-
-    decrypted = decrypt(encrypted, key)  # decrypt the encrypted word
-
-    print("The original word is:", message)
-    print("The encrypted word is:", encrypted)
-    print("The decrypted word is:", decrypted)
+#if d is chosen that means decrypt mode is selected, calling the decrypt function and printing plain text
+if user_input == 'd':
+    print('DECRYPTION MODE SELECTED')
+    print()
+    key = int(input('Enter the key (1 through 26):' ))
+    text = input('Enter the text to decrypt: ')
+    plaintext = decrypt(text, key)
+    print(f'PLAINTEXT:{plaintext}')
